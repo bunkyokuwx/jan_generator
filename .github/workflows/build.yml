@@ -5,18 +5,29 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          
       - name: Install dependencies
         run: |
           pip install pillow fonttools pyinstaller
+          
       - name: Build with PyInstaller
+        # 移除了 --splash，指定了 --icon，并修正了目标文件名为 -macOS.py
         run: |
-          pyinstaller -D -w -n "JANCodeTool_mac" --splash Splash.png --add-data "JAN_ICON.ico:." JANcode-V24.py
+          pyinstaller -w -n "JANCodeTool_mac" --icon "JAN_ICON.icns" JANCode-V24-macOS.py
+          
+      - name: Zip app bundle
+        # 必须先压缩为 zip，保证内部二进制文件的执行权限不丢失
+        run: |
+          cd dist
+          zip -r JANCodeTool_mac.zip JANCodeTool_mac.app
+          
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: macOS-App
-          path: dist/JANCodeTool_mac.app
+          path: dist/JANCodeTool_mac.zip
