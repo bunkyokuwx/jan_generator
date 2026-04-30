@@ -24,10 +24,10 @@ jobs:
           pyinstaller -w -n "JANコード作成ツール_mac_V1.0" --icon "JAN_ICON.icns" --add-data "OCRB.TTF:." JANcode-V35.py
           
       - name: Zip app bundle
-        # macOS の .app フォルダはそのままアップロードすると実行権限が壊れるため、必ず zip 圧縮する
         run: |
           cd dist
-          zip -r JANCodeTool_mac.zip JANCodeTool_mac.app
+          ls -l  # 打印出 dist 目录下的所有文件，方便我们在日志里查看它的真面目
+          zip -r JANCodeTool_mac.zip .  # 注意最后有个点，代表打包当前目录下的所有内容
           
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
