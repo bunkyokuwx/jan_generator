@@ -16,12 +16,15 @@ jobs:
           pip install pillow fonttools pyinstaller
           
       - name: Build with PyInstaller
-        # 移除了 --splash，指定了 --icon，并修正了目标文件名为 -macOS.py
+        # 注意: 
+        # 1. -w でコンソール非表示、-n でアプリ名指定
+        # 2. --add-data の区切り文字は macOS なのでコロン (:)
+        # 3. ファイル名の大文字・小文字は厳密に一致させること
         run: |
-          pyinstaller -w -n "JANCodeTool_mac" --icon "JAN_ICON.icns" JANCode-V24-macOS.py
+          pyinstaller -w -n "JANCodeTool_mac" --icon "JAN_ICON.icns" --add-data "OCRB.TTF:." JANcode-V35.py
           
       - name: Zip app bundle
-        # 必须先压缩为 zip，保证内部二进制文件的执行权限不丢失
+        # macOS の .app フォルダはそのままアップロードすると実行権限が壊れるため、必ず zip 圧縮する
         run: |
           cd dist
           zip -r JANCodeTool_mac.zip JANCodeTool_mac.app
