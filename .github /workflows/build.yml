@@ -1,0 +1,36 @@
+name: Build macOS App
+on: [push]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          pip install pillow fonttools pyinstaller
+          
+      - name: Build with PyInstaller
+        # 注意: 
+        # 1. -w でコンソール非表示、-n でアプリ名指定
+        # 2. --add-data の区切り文字は macOS なのでコロン (:)
+        # 3. ファイル名の大文字・小文字は厳密に一致させること
+        run: |
+          pyinstaller -w -n "JANコード作成ツール_mac_V1.0" --icon "JAN_ICON.icns" --add-data "OCRB.TTF:." JANcode-V35.py
+          
+      - name: Zip app bundle
+        # macOS の .app フォルダはそのままアップロードすると実行権限が壊れるため、必ず zip 圧縮する
+        run: |
+          cd dist
+          zip -r JANCodeTool_mac.zip JANCodeTool_mac.app
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macOS-App
+          path: dist/JANCodeTool_mac.zip
